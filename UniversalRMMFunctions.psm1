@@ -930,7 +930,7 @@ if (!($env:RMMEventSource)) {
   Write-Error "Environment Variable RMMEventSource must be set to import this module."
   Exit 1
 } else {
+  #You may set this path to wherever you are loading this module from statically. The module expects 7za.exe to be present in this path.
+  $env:UniversalRMMPath = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
   New-RMMEventSource -Source $env:RMMEventSource
-  #Set this path to wherever you are loading this module from - $env:Windir\ltsvc\UniversalRMM for CW Automate, etc
-  $env:UniversalRMMPath = "$($env:ProgramData)\CentraStage\UniversalRMM"
 }
