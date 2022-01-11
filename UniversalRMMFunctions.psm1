@@ -97,8 +97,7 @@ function Get-DattoID {
   return (Get-ItemProperty -Path HKLM:\SOFTWARE\CentraStage -Name DeviceID).DeviceID
 }
 
-Function Install-MSI
-{
+Function Install-MSI {
 Param (
   [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
   [ValidateNotNullOrEmpty()]
@@ -268,7 +267,7 @@ Function Test-IsServer2019 {
 }
 
 Function Test-IsPortable {
-  if (Get-WmiObject -Class Win32_SystemEnclosure | Where-Object {
+  if (Get-WmiObject Win32_SystemEnclosure | Where-Object {
     $_.ChassisTypes -eq 9 -or $_.ChassisTypes -eq 10 -or $_.ChassisTypes -eq 14}) {
       return $true
     } 
@@ -276,11 +275,11 @@ Function Test-IsPortable {
 }
 
 Function Test-IsDomainController {
-  return ((Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -eq 2)
+  return ((Get-WmiObject Win32_OperatingSystem).ProductType -eq 2)
 }
 
 Function Test-License {
-  $varLicense = (Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "Name like 'Windows%'" | Where-Object PartialProductKey).licensestatus
+  $varLicense = (Get-WmiObject SoftwareLicensingProduct -Filter "Name like 'Windows%'" | Where-Object PartialProductKey).licensestatus
   if ($varLicense -eq 1) { 
     return $true
   } 
@@ -383,7 +382,7 @@ function Test-InstalledSoftware {
   }
 
   if ($AllUsers -or $GlobalAndAllUsers) {
-    $AllProfiles = Get-CimInstance Win32_UserProfile | 
+    $AllProfiles = Get-WmiObject Win32_UserProfile | 
       Select-Object LocalPath, SID, Loaded, Special | 
       Where-Object {$_.SID -like "S-1-5-21-*"}
     $MountedProfiles = $AllProfiles | Where-Object {$_.Loaded -eq $true}
@@ -423,7 +422,6 @@ function Test-InstalledSoftware {
   return $false
 }
 
-#This needs to be rewritten not to use += but is still a million times faster and more correct than WMI
 function Get-UninstallString {
   [cmdletbinding(DefaultParameterSetName = 'GlobalAndAllUsers')]
 
@@ -509,7 +507,7 @@ function Get-UninstallString {
   }
 
   if ($AllUsers -or $GlobalAndAllUsers) {
-    $AllProfiles = Get-CimInstance Win32_UserProfile | 
+    $AllProfiles = Get-WmiObject Win32_UserProfile | 
       Select-Object LocalPath, SID, Loaded, Special | 
       Where-Object {$_.SID -like "S-1-5-21-*"}
     $MountedProfiles = $AllProfiles | Where-Object {$_.Loaded -eq $true}
@@ -557,7 +555,6 @@ function Get-UninstallString {
   return ""
 }
 
-#This needs to be rewritten not to use += but is still a million times faster and more correct than WMI
 function Get-ApplicationList {
   [cmdletbinding(DefaultParameterSetName = 'GlobalAndAllUsers')]
 
@@ -612,7 +609,7 @@ function Get-ApplicationList {
   }
 
   if ($AllUsers -or $GlobalAndAllUsers) {
-    $AllProfiles = Get-CimInstance Win32_UserProfile | 
+    $AllProfiles = Get-WmiObject Win32_UserProfile | 
       Select-Object LocalPath, SID, Loaded, Special | 
       Where-Object {$_.SID -like "S-1-5-21-*"}
     $MountedProfiles = $AllProfiles | Where-Object {$_.Loaded -eq $true}
